@@ -7,7 +7,7 @@ by running the js before the site is deployed.
 
 const { readPage } = require("./utils.js");
 const fs = require("fs");
-const { VM } = require("vm2");
+const { Jintr } = require("jintr");
 const { createHash } = require("crypto");
 
 const targetPage = "./index.html";
@@ -74,12 +74,7 @@ const webringDown = (document, selector, webringName, err) => {
 
 const build = async () => {
   const { document, window } = await readPage(targetPage);
-  const vm = new VM({
-    sandbox: {
-      document: document,
-      window: window
-    }
-  });
+  const sandbox = { document, window };
   const dataFolderName = "./data/webring-members";
   if (!fs.existsSync(dataFolderName))
     fs.mkdirSync(dataFolderName);
@@ -95,11 +90,11 @@ const build = async () => {
     webring.innerHTML = "";
     const hash = genHash(data);
     if (hash === hashes.cobalt) {
-      vm.run(data);
+      const jintr = new Jintr({ sandbox });
+      await jintr.run(data);
       fs.writeFileSync(
         `${dataFolderName}/cobalt.json`,
-        JSON.stringify(vm.getGlobal("cobaltWebring_members")
-          .map(e=>`https://${e}`))
+        JSON.stringify(jintr.context.cobaltWebring_members.map(e => `https://${e}`))
       );
       //webring.removeAttribute("name");
       //webring.removeAttribute("id");
@@ -141,7 +136,8 @@ const build = async () => {
         editedData = editedData.replace(`next →`, "-&gt;");
         editedData = editedData.replace(/(?<=\$\{(?:random|index)Text\})[\s\n]+/g, "");
         editedData = editedData.replace(/(?<=tag\.insertAdjacentHTML\('afterbegin', `[\s\S]*)  `/g, `\``);
-        vm.run(editedData);
+  const jintr = new Jintr({ sandbox });
+  await jintr.run(editedData);
         const randomATag = webring.querySelector(`a[href="javascript:void(0)"]`);
         webring.querySelectorAll(`.webring-prev, .webring-next`).forEach(e=>e.classList.add("nowrap"));
         randomATag.href = `${randomURL}/cohost`;
