@@ -7,7 +7,6 @@
     "serve": "vite preview",
     "build": "vite build",
     "watch": "vite build --watch",
-    "test": "vite build"
   },
   "dependencies": {
     "jintr": "^3.3.1",
