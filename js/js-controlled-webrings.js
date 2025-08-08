@@ -7,7 +7,7 @@ by running the js before the site is deployed.
 
 const { readPage } = require("./utils.js");
 const fs = require("fs");
-const Jinter = require("jintr");
+const Jinter = require("jintr").default;
 const { createHash } = require("crypto");
 
 const targetPage = "./index.html";
@@ -95,10 +95,10 @@ const build = async () => {
     webring.innerHTML = "";
     const hash = genHash(data);
     if (hash === hashes.cobalt) {
-      vm.run(data);
+      interpreter.evaluate(data);
       fs.writeFileSync(
         `${dataFolderName}/cobalt.json`,
-        JSON.stringify(vm.getGlobal("cobaltWebring_members")
+        JSON.stringify(interpreter.scope.get("cobaltWebring_members")
           .map(e=>`https://${e}`))
       );
       //webring.removeAttribute("name");
