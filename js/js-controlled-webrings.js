@@ -7,7 +7,7 @@ by running the js before the site is deployed.
 
 const { readPage } = require("./utils.js");
 const fs = require("fs");
-const { VM } = require("vm2");
+const Jinter = require("jintr");
 const { createHash } = require("crypto");
 
 const targetPage = "./index.html";
@@ -74,8 +74,8 @@ const webringDown = (document, selector, webringName, err) => {
 
 const build = async () => {
   const { document, window } = await readPage(targetPage);
-  const vm = new VM({
-    sandbox: {
+  const interpreter = new Jinter({
+    scope: {
       document: document,
       window: window
     }
@@ -141,7 +141,7 @@ const build = async () => {
         editedData = editedData.replace(`next →`, "-&gt;");
         editedData = editedData.replace(/(?<=\$\{(?:random|index)Text\})[\s\n]+/g, "");
         editedData = editedData.replace(/(?<=tag\.insertAdjacentHTML\('afterbegin', `[\s\S]*)  `/g, `\``);
-        vm.run(editedData);
+        interpreter.evaluate(editedData);
         const randomATag = webring.querySelector(`a[href="javascript:void(0)"]`);
         webring.querySelectorAll(`.webring-prev, .webring-next`).forEach(e=>e.classList.add("nowrap"));
         randomATag.href = `${randomURL}/cohost`;
