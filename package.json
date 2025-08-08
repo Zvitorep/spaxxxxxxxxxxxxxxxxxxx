@@ -6,7 +6,7 @@
     "serve-dev": "vite --config vite.dev.config.js",
     "serve": "vite preview",
     "build": "vite build",
-    "watch": "vite build --watch",
+    "watch": "vite build --watch"
   },
   "dependencies": {
     "jintr": "^3.3.1",
